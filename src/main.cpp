@@ -85,8 +85,10 @@ void step(double dt){
 }
 
 int main(){
-    sf::RenderWindow win({(unsigned)WIDTH,(unsigned)HEIGHT},
-        "N-Body Gravity | 1:Solar 2:Random 3:Binary | Space:Pause | T:Trails | LMB:Add");
+    sf::RenderWindow win(
+        sf::VideoMode({(unsigned)WIDTH,(unsigned)HEIGHT}),
+        "N-Body Gravity | 1:Solar 2:Random 3:Binary | Space:Pause | T:Trails | LMB:Add"
+    );
     win.setFramerateLimit(60);
     srand((unsigned)time(0));
     makeSolar();
@@ -102,12 +104,6 @@ int main(){
     hud.setOutlineColor(sf::Color::Black); hud.setOutlineThickness(1.5f);
     hud.setPosition({8,8});
     sf::Clock clk;
-
-    // Offscreen texture for trails
-    sf::Image trailImg({(unsigned)WIDTH,(unsigned)HEIGHT},sf::Color::Black);
-    sf::Texture trailTex; trailTex.loadFromImage(trailImg);
-    sf::Sprite trailSpr(trailTex);
-    sf::Image fadeImg({(unsigned)WIDTH,(unsigned)HEIGHT},sf::Color(0,0,0,12));
 
     while(win.isOpen()){
         float dt=std::min(clk.restart().asSeconds(),0.02f);
@@ -134,7 +130,6 @@ int main(){
 
         win.clear(sf::Color(8,10,18));
 
-        // Draw trails as lines
         if(trails){
             for(auto&b:bodies){
                 int sz=b.trail.size();
@@ -151,17 +146,13 @@ int main(){
 
         sf::CircleShape cs;
         for(auto&b:bodies){
-            // Glow
             cs.setRadius(b.rad*2.f);
             cs.setOrigin({b.rad*2.f,b.rad*2.f});
             cs.setPosition({(float)b.x,(float)b.y});
             cs.setFillColor(sf::Color(b.col.r,b.col.g,b.col.b,40));
             win.draw(cs);
-            // Body
-            cs.setRadius(b.rad);
-            cs.setOrigin({b.rad,b.rad});
-            cs.setFillColor(b.col);
-            win.draw(cs);
+            cs.setRadius(b.rad); cs.setOrigin({b.rad,b.rad});
+            cs.setFillColor(b.col); win.draw(cs);
         }
 
         if(hf){
